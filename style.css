@@ -35,36 +35,32 @@ body {
 
 /* --- APP CONTAINER --- */
 #app-container {
-    width: 100%;
-    height: 100%;
-    background: var(--bg-grad);
+    /* MOBILE DEFAULT: Force full screen */
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
     position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    
-    /* DESKTOP MODE (Default) */
-    max-width: 480px; /* Keep it phone-shaped on PC */
-    margin: 0 auto;   /* Center it */
-    box-shadow: 0 0 50px rgba(0,0,0,0.1);
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
 }
 
-/* MOBILE MODE (Override) */
-/* We use max-width: 800px to ensure it catches ALL phones */
-@media screen and (max-width: 800px) {
+/* DESKTOP OVERRIDE: Only if screen is HUGE (larger than 800px) */
+@media screen and (min-width: 801px) {
     body {
-        /* Reset body to allow full width */
-        align-items: flex-start; 
-        background: #fff;
+        background: #dfe6e9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-
+    
     #app-container {
-        max-width: 100% !important; /* FORCE full width */
-        width: 100vw !important;    /* Force viewport width */
-        height: 100vh !important;   /* Force viewport height */
-        box-shadow: none;
-        border-radius: 0;
-        margin: 0;
+        max-width: 480px; /* Force phone size on PC */
+        height: 100%;
+        box-shadow: 0 0 50px rgba(0,0,0,0.1);
     }
 }
 
