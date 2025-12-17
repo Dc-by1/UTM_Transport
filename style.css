@@ -33,11 +33,10 @@ body {
     align-items: center; /* Center the app on larger screens */
 }
 
-/* --- APP CONTAINER --- */
+/* --- APP CONTAINER (FORCED FULL SCREEN) --- */
 #app-container {
-    /* MOBILE DEFAULT: Force full screen */
-    width: 100vw;
-    height: 100vh;
+    width: 100vw;       /* 100% of Viewport Width */
+    height: 100vh;      /* 100% of Viewport Height */
     background: #ffffff;
     position: relative;
     display: flex;
@@ -45,23 +44,18 @@ body {
     overflow: hidden;
     margin: 0;
     padding: 0;
-    box-shadow: none;
+    box-shadow: none;   /* No shadow */
+    max-width: none !important; /* DELETE ANY WIDTH LIMITS */
 }
 
-/* DESKTOP OVERRIDE: Only if screen is HUGE (larger than 800px) */
-@media screen and (min-width: 801px) {
-    body {
-        background: #dfe6e9;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    #app-container {
-        max-width: 480px; /* Force phone size on PC */
-        height: 100%;
-        box-shadow: 0 0 50px rgba(0,0,0,0.1);
-    }
+/* Ensure Body is locked */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
 }
 
 /* --- HEADER --- */
