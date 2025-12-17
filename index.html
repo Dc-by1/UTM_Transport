@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UTM Transport</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <header id="app-header" class="hidden">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon"><i class="fas fa-bus-alt"></i></div>
+                    <span class="logo-text">UTM Transport</span>
+                </div>
+                <div class="profile-icon-btn" onclick="router('profile')">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profile">
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            
+            <section id="view-login" class="view active">
+                <div class="login-wrapper">
+                    <div class="brand-large">
+                        <div class="logo-circle"><i class="fas fa-bus-alt"></i></div>
+                        <h1>UTM Transport</h1>
+                        <p>Campus Mobility Solutions</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="input-box">
+                            <i class="fas fa-graduation-cap"></i>
+                            <input type="email" id="email-input" placeholder="student@graduate.utm.my" required>
+                        </div>
+                        <div class="input-box">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password-input" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn-main">Login now</button>
+                    </form>
+                    <p class="login-note">Restricted to <b>graduate.utm.my</b> accounts.</p>
+                </div>
+            </section>
+
+            <section id="view-home" class="view">
+                <div class="welcome-banner">
+                    <h2>Hi, Xiao Hui! 👋</h2>
+                    <p>Where are you heading today?</p>
+                </div>
+
+                <div class="card-grid">
+                    <div class="service-card" onclick="router('bus')">
+                        <div class="card-icon bus-bg"><i class="fas fa-bus"></i></div>
+                        <div class="card-text">
+                            <h3>Bus Tracker</h3>
+                            <p>Live ETA & Routes</p>
+                        </div>
+                        <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+
+                    <div class="service-card" onclick="router('car')">
+                        <div class="card-icon car-bg"><i class="fas fa-car"></i></div>
+                        <div class="card-text">
+                            <h3>Book & Drive</h3>
+                            <p>Carpool with peers</p>
+                        </div>
+                        <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+
+                    <div class="service-card" onclick="router('bike')">
+                        <div class="card-icon bike-bg"><i class="fas fa-bicycle"></i></div>
+                        <div class="card-text">
+                            <h3>Bicycles</h3>
+                            <p>Rent & Ride</p>
+                        </div>
+                        <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+
+                <div class="status-widget">
+                    <h4>Campus Status</h4>
+                    <div class="status-row">
+                        <span><i class="fas fa-cloud-sun"></i> Weather</span>
+                        <span class="status-good">32°C Sunny</span>
+                    </div>
+                    <div class="status-row">
+                        <span><i class="fas fa-road"></i> Traffic</span>
+                        <span class="status-ok">Moderate</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-bus" class="view">
+                <div class="page-title"><h3>Live Bus Tracking</h3></div>
+                <div id="map-bus" class="map-box"></div>
+                <div class="list-container">
+                    <div class="list-card" onclick="openTrackSheet('Bus G2', 'KTR -> KTHO -> N28', '5 min')">
+                        <div class="list-info">
+                            <h4>Bus G2 (KTR -> KTHO -> N28)</h4>
+                            <span class="badge live">Moving</span>
+                        </div>
+                        <div class="list-meta">
+                            <p><i class="fas fa-clock"></i> 5 min</p>
+                            <button class="btn-sm">Track</button>
+                        </div>
+                    </div>
+                    <div class="list-card" onclick="openTrackSheet('Bus F1', 'KTR -> N29', '12 min')">
+                        <div class="list-info">
+                            <h4>Bus F1 (KTR -> N29)</h4>
+                            <span class="badge delay">Delayed</span>
+                        </div>
+                        <div class="list-meta">
+                            <p><i class="fas fa-clock"></i> 15 min</p>
+                            <button class="btn-sm">Track</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-car" class="view">
+                <div class="tab-header">
+                    <button class="tab-link active" onclick="openTab('find-ride')">Find Ride</button>
+                    <button class="tab-link" onclick="openTab('offer-ride')">Offer Ride</button>
+                </div>
+
+                <div id="find-ride" class="tab-content active">
+                    <div class="search-container">
+                        <div class="search-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="ride-dest-input" placeholder="To? (e.g. N28, JB Sentral)" onkeyup="filterRides()">
+                        </div>
+                        <div class="search-row">
+                            <i class="fas fa-clock"></i>
+                            <input type="time" id="ride-time-input" onchange="filterRides()">
+                        </div>
+                        <button class="btn-search" onclick="filterRides()">Search</button>
+                    </div>
+                    
+                    <h4 style="margin: 15px 0 10px; color: var(--text-gray); font-size: 0.9rem;">Available Rides</h4>
+
+                    <div id="ride-list">
+                        <div class="list-card ride-card" data-dest="JB Sentral" onclick="openBookingSheet('Ali', 'Myvi (JBV 1234)', 'Kolej Tun Razak', 'JB Sentral', '5.00')">
+                            <div class="driver-info">
+                                <img src="https://ui-avatars.com/api/?name=Ali&background=random" class="avatar-sm">
+                                <div>
+                                    <h4>Ali's Myvi</h4>
+                                    <p class="route-info"><i class="fas fa-map-pin"></i> From: <b>Kolej Tun Razak</b></p>
+                                    <p class="route-info">To: <b>JB Sentral</b> • 2:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="price-tag">RM 5.00</div>
+                        </div>
+
+                        <div class="list-card ride-card" data-dest="Paradigm Mall" onclick="openBookingSheet('Sarah', 'Vios (JJA 8888)', 'N24', 'Paradigm Mall', '8.00')">
+                            <div class="driver-info">
+                                <img src="https://ui-avatars.com/api/?name=Sarah&background=random" class="avatar-sm">
+                                <div>
+                                    <h4>Sarah's Vios</h4>
+                                    <p class="route-info"><i class="fas fa-map-pin"></i> From: <b>N24</b></p>
+                                    <p class="route-info">To: <b>Paradigm Mall</b> • 3:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="price-tag">RM 8.00</div>
+                        </div>
+
+                        <div class="list-card ride-card" data-dest="N28" onclick="openBookingSheet('Ahmad', 'Axia (JRT 4545)', 'KTDI', 'N28', '2.00')">
+                            <div class="driver-info">
+                                <img src="https://ui-avatars.com/api/?name=Ahmad&background=random" class="avatar-sm">
+                                <div>
+                                    <h4>Ahmad's Axia</h4>
+                                    <p class="route-info"><i class="fas fa-map-pin"></i> From: <b>KTDI</b></p>
+                                    <p class="route-info">To: <b>N28</b> • 11:00 AM</p>
+                                </div>
+                            </div>
+                            <div class="price-tag">RM 2.00</div>
+                        </div>
+                    </div>
+                    
+                    <div id="no-rides-msg" style="display:none; text-align:center; margin-top:30px; color:#b2bec3;">
+                        <i class="fas fa-car-crash" style="font-size:3rem; margin-bottom:10px;"></i>
+                        <p>No rides found for this route.</p>
+                    </div>
+                </div>
+
+                <div id="offer-ride" class="tab-content">
+                    <div class="form-card">
+                        <h3>Create a Trip</h3>
+                        <input type="text" class="input-std" placeholder="Destination">
+                        <input type="datetime-local" class="input-std">
+                        <input type="number" class="input-std" placeholder="Available Seats">
+                        <input type="number" class="input-std" placeholder="Price (RM)">
+                        <button class="btn-main" onclick="processPublish()">Publish Ride</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-bike" class="view">
+                <div class="page-title"><h3>Bike Stations</h3></div>
+                <div id="map-bike" class="map-box"></div>
+                <div class="list-container">
+                    <div class="list-card" onclick="openBikeSheet('Library Hub', 8)">
+                        <div class="list-info">
+                            <h4>UTM Library (PSZ) </h4>
+                            <p>Walk: 2 mins</p>
+                        </div>
+                        <div class="bike-count"><span class="count">8</span> Bikes</div>
+                    </div>
+                    <div class="list-card" onclick="openBikeSheet('Arcade Block', 3)">
+                        <div class="list-info">
+                            <h4>Arked Meranti</h4>
+                            <p>Walk: 10 mins</p>
+                        </div>
+                        <div class="bike-count low"><span class="count">3</span> Bikes</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-profile" class="view">
+                <div class="profile-header-card">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="profile-pic-lg">
+                    <h2>Xiao Hui</h2>
+                    <p>xiaohui@graduate.utm.my</p>
+                    <div class="stats-row">
+                        <div class="stat"><b>12</b> Rides</div>
+                        <div class="stat"><b>4.9</b> Rating</div>
+                    </div>
+                </div>
+
+                <div class="menu-list">
+                    <div class="menu-item" onclick="router('wallet')">
+                        <i class="fas fa-wallet"></i> My Wallet
+                        <span style="margin-left:auto; font-size:0.8rem; color:var(--primary);">RM 45.00</span>
+                    </div>
+                    
+                    <div class="menu-item" onclick="alert('Feature: Edit Personal Details')">
+                        <i class="fas fa-user-edit"></i> Edit Details
+                    </div>
+                    <div class="menu-item" onclick="alert('Feature: Ride History List')">
+                        <i class="fas fa-history"></i> Trip History
+                    </div>
+                    <div class="menu-item" onclick="alert('Feature: Customer Support Chat')">
+                        <i class="fas fa-headset"></i> Support
+                    </div>
+                    <div class="menu-item logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-wallet" class="view">
+                <div class="page-title">
+                    <button class="back-btn-small" onclick="router('profile')"><i class="fas fa-arrow-left"></i></button>
+                    <h3>My E-Wallet</h3>
+                </div>
+
+                <div class="wallet-card-main">
+                    <p>Total Balance</p>
+                    <h1>RM 45.00</h1>
+                    <div class="wallet-actions">
+                        <button class="action-btn" onclick="openTopUpSheet()">
+                            <div class="icon-circle"><i class="fas fa-plus"></i></div>
+                            <span>Top Up</span>
+                        </button>
+                        <button class="action-btn">
+                            <div class="icon-circle"><i class="fas fa-qrcode"></i></div>
+                            <span>Scan</span>
+                        </button>
+                        <button class="action-btn">
+                            <div class="icon-circle"><i class="fas fa-exchange-alt"></i></div>
+                            <span>Transfer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="trans-section">
+                    <h4>Recent Transactions</h4>
+                    
+                    <div class="list-card trans-item">
+                        <div class="trans-icon ride"><i class="fas fa-car"></i></div>
+                        <div class="trans-details">
+                            <h4>Carpool Payment</h4>
+                            <p>Today, 2:00 PM</p>
+                        </div>
+                        <div class="trans-amount negative">- RM 5.00</div>
+                    </div>
+
+                    <div class="list-card trans-item">
+                        <div class="trans-icon topup"><i class="fas fa-plus"></i></div>
+                        <div class="trans-details">
+                            <h4>Top Up (TNG)</h4>
+                            <p>Yesterday</p>
+                        </div>
+                        <div class="trans-amount positive">+ RM 50.00</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <div id="overlay-backdrop" class="overlay-backdrop" onclick="closeAllOverlays()"></div>
+
+        <div id="sheet-booking" class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h3>Confirm Booking</h3>
+            <div class="sheet-content">
+                <div class="ride-summary">
+                    <div class="summary-row">
+                        <span>Driver</span>
+                        <strong id="book-driver">Ali</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Vehicle</span>
+                        <strong id="book-car">Myvi (JBV 1234)</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Destination</span>
+                        <strong id="book-dest">JB Sentral</strong>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span class="total-price" id="book-price">RM 5.00</span>
+                    </div>
+                </div>
+                <button class="btn-main" onclick="confirmRide()">Pay & Confirm</button>
+            </div>
+        </div>
+
+        <div id="sheet-tracking" class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-content center-text">
+                <div class="live-indicator"><div class="pulse-dot"></div> Live Tracking</div>
+                <h2 id="track-route">Route A</h2>
+                <p id="track-desc">Lingkaran Ilmu</p>
+                <div class="eta-large">
+                    <span id="track-eta">5</span> <small>mins</small>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="status-text">Bus is approaching the stop...</p>
+                <button class="btn-secondary" onclick="closeAllOverlays()">Close</button>
+            </div>
+        </div>
+
+        <div id="sheet-bike" class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h3>Rent a Bike</h3>
+            <div class="sheet-content">
+                <div class="bike-details">
+                    <i class="fas fa-bicycle bike-icon-lg"></i>
+                    <h4 id="bike-station">Library Hub</h4>
+                    <p>RM 1.00 / 30 mins</p>
+                </div>
+                <button class="btn-main" onclick="processBikeUnlock()">Unlock Now</button>
+            </div>
+        </div>
+
+<div id="overlay-success" class="full-overlay hidden">
+            <div class="success-content">
+                <div class="checkmark-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 id="success-title">Success!</h2>
+                <p id="success-msg">Your ride has been booked.</p>
+                <div class="ticket-card" id="success-ticket">
+                    </div>
+                <button class="btn-white" onclick="closeSuccess()">Continue</button>
+            </div>
+        </div>
+
+        <div id="sheet-topup" class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h3>Top Up Wallet</h3>
+            <p style="color:#636e72; margin-bottom:20px;">Select a payment method</p>
+            
+            <div class="sheet-content">
+                <div class="pay-method" onclick="simulatePayment('Touch n Go eWallet', '#0054a6')">
+                    <div class="pay-icon" style="background: #0054a6; color:white;"><i class="fas fa-wallet"></i></div>
+                    <div class="pay-text">
+                        <h4>TNG eWallet</h4>
+                        <p>Redirect to TNG App</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+                <div class="pay-method" onclick="simulatePayment('FPX Online Banking', '#eb3b5a')">
+                    <div class="pay-icon" style="background: #eb3b5a; color:white;"><i class="fas fa-university"></i></div>
+                    <div class="pay-text">
+                        <h4>Online Banking (FPX)</h4>
+                        <p>Maybank2u, CIMB, etc.</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+                <div class="pay-method" onclick="simulatePayment('Credit/Debit Card', '#2d3436')">
+                    <div class="pay-icon" style="background: #2d3436; color:white;"><i class="fas fa-credit-card"></i></div>
+                    <div class="pay-text">
+                        <h4>Credit / Debit Card</h4>
+                        <p>Visa / Mastercard</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div id="overlay-loading" class="full-overlay hidden" style="background:white; color:#2d3436;">
+            <div class="loader-spinner"></div>
+            <h3 id="loading-text" style="margin-top:20px;">Redirecting...</h3>
+        </div>
+
+        <nav id="bottom-nav" class="hidden">
+            <button class="nav-btn" onclick="router('home')" id="nav-home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" onclick="router('bus')" id="nav-bus">
+                <i class="fas fa-bus"></i>
+                <span>Bus</span>
+            </button>
+            <button class="nav-btn" onclick="router('car')" id="nav-car">
+                <i class="fas fa-car"></i>
+                <span>Drive</span>
+            </button>
+            <button class="nav-btn" onclick="router('bike')" id="nav-bike">
+                <i class="fas fa-bicycle"></i>
+                <span>Bike</span>
+            </button>
+            <button class="nav-btn" onclick="router('profile')" id="nav-profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+        </nav>
+
+    </div> <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
