@@ -13,15 +13,46 @@
 }
 
 /* --- RESET & GLOBAL --- */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: #dfe6e9; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+* { 
+    margin: 0; padding: 0; box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+html, body {
+    width: 100%;
+    height: 100%; /* Force full height */
+    overflow: hidden; /* STOP the whole page from scrolling */
+    position: fixed; /* Lock the body in place */
+    background: #dfe6e9; /* Background behind the app container */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the app on larger screens */
+}
 
 /* --- APP CONTAINER --- */
 #app-container {
-    width: 100%; max-width: 450px; height: 100%;
+    width: 100%;
+    height: 100%; /* Fill the screen */
+    max-width: 480px; /* On desktop, keep it phone-sized */
     background: var(--bg-grad);
-    position: relative; display: flex; flex-direction: column;
-    box-shadow: 0 0 50px rgba(0,0,0,0.1); overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hide overflow globally */
+    box-shadow: 0 0 50px rgba(0,0,0,0.1);
+}
+
+/* On real mobile devices, remove the shadow and max-width to be truly full screen */
+@media only screen and (max-width: 480px) {
+    #app-container {
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
 }
 
 /* --- HEADER --- */
